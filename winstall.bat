@@ -1,4 +1,6 @@
 @REM  
+@REM Aun no ha sido probado en windows
+@REM 
 @REM    Autores:
     @REM  Alejandro de Jesús ¨Sánchez Morales
     @REM  Emanuel Alejandro Solórzano Guzmán
