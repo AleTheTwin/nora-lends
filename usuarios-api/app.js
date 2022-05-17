@@ -2,8 +2,6 @@ const { PrismaClient } = require("@prisma/client");
 const express = require("express");
 const { ensureAuthenticated } = require("./controllers/checkToken");
 const { createToken } = require("./controllers/create-token");
-const fileUpload = require("express-fileupload");
-const path = require("path");
 const passwordController = require("./controllers/password-hash");
 
 const documentacionUrl = "http://noralends.host/docs";
@@ -13,7 +11,6 @@ const prisma = new PrismaClient();
 const app = express();
 
 app.use(express.json());
-app.use(fileUpload());
 
 const PORT = process.env.PORT || 3000;
 
@@ -31,10 +28,16 @@ app.post("/login", async (req, res) => {
         const usuario = await prisma.usuario.findUnique({
             where: {
                 username,
-            }
+            },
         });
 
-        if (!usuario || !(await passwordController.passwordVerify(password, usuario.password)) ) {
+        if (
+            !usuario ||
+            !(await passwordController.passwordVerify(
+                password,
+                usuario.password
+            ))
+        ) {
             res.json({
                 error: "Credenciales incorrectas",
             });
@@ -44,9 +47,8 @@ app.post("/login", async (req, res) => {
         res.json({
             username: usuario.username,
             id: usuario.id,
-            token: createToken(usuario?.username),
+            token: await createToken(usuario),
         });
-
     } catch (e) {
         handleError(e, res);
         return;
@@ -59,6 +61,7 @@ app.get("/users/", ensureAuthenticated, async (req, res) => {
             select: {
                 password: false,
                 username: true,
+                id: true,
             },
         });
         res.json(usuarios);

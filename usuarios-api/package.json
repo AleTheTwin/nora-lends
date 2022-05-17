@@ -6,7 +6,7 @@
     "scripts": {
         "generate": "npx prisma generate",
         "create-user": "node create-user",
-        "start": "node index.js",
+        "start": "node app.js",
         "docker": "docker-compose up -d",
         "docker-down": "docker-compose down"
     },

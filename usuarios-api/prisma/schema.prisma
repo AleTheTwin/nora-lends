@@ -43,3 +43,8 @@ model Evento {
   notas               Nota[]
   autor               Persona  @relation(references: [id], fields: [autorId])
 }
+
+model token {
+  id       String  @unique
+  isActive Boolean @default(false)
+}
