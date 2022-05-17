@@ -12,7 +12,13 @@ const app = express();
 
 app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
+
+app.get("/", (req, res) => {
+    res.json({
+        message: "Nora Lends - users api",
+    });
+});
 
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
@@ -22,6 +28,7 @@ app.post("/login", async (req, res) => {
             error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
             code: `P0001`,
         });
+        return;
     }
 
     try {
@@ -38,8 +45,9 @@ app.post("/login", async (req, res) => {
                 usuario.password
             ))
         ) {
-            res.json({
+            res.status(400).json({
                 error: "Credenciales incorrectas",
+                code: "C10001"
             });
             return;
         }
@@ -71,9 +79,150 @@ app.get("/users/", ensureAuthenticated, async (req, res) => {
     }
 });
 
-const server = app.listen(PORT, () => {
-    console.log(`NORA API listening on port ${PORT}, http://localhost:${PORT}`);
+app.get("/personas/", ensureAuthenticated, async (req, res) => {
+    const usuario = req.user;
+
+    try {
+        const personas = await prisma.persona.findMany({
+            select: {
+                id: true,
+                nombre: true,
+                email: true,
+                username: true,
+            },
+        });
+        res.json(personas);
+    } catch (error) {
+        handleError(error, res);
+        return;
+    }
 });
+
+app.get("/personas/:id", ensureAuthenticated, async (req, res) => {
+    const usuario = req.user;
+    const { id } = req.params;
+    if(!id) {
+        res.status(500).json({
+            error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
+            code: `P0001`,
+        });
+        return;
+    }
+    try {
+        const persona = await prisma.persona.findUnique({
+            select: {
+                id: true,
+                nombre: true,
+                email: true,
+                username: true,
+            },
+            where: {
+                id
+            }
+        });
+        if ( ! persona ) {
+            res.status(404).json({
+                error: `Usuario con id ${id} no encontrado.`,
+                code: "R0001"
+            });
+            return;
+        } 
+        res.json(persona);
+    } catch (error) {
+        handleError(error, res);
+        return;
+    }
+});
+
+app.post("/personas/", ensureAuthenticated, async (req, res) => {
+    const usuario = req.user;
+    const { username, email, nombre, password } = req.body;
+
+    if (!username || !email || !nombre || !password) {
+        res.status(500).json({
+            error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
+            code: `P0001`,
+        });
+        return;
+    }
+
+    const persona = {
+        username,
+        email,
+        nombre,
+        password: await passwordController.hashPassword(password)
+    }
+
+    try {
+        const result = await prisma.persona.create({
+            data: persona
+        });
+        res.json(result);
+    } catch (error) {
+        handleError(error, res);
+        return;
+    }
+});
+
+app.put("/personas/:id", ensureAuthenticated, async (req, res) => {
+    const usuario = req.user;
+    const { id } = req.params
+    var { username, email, nombre, password } = req.body;
+
+    if (!id || (!username && !email && !nombre && !password)) {
+        res.status(500).json({
+            error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
+            code: `P0001`,
+        });
+        return;
+    }
+
+    try {
+        const personaStored = await prisma.persona.findUnique({
+            where: {
+                id
+            }
+        });
+        
+        if(!username) {
+            username = personaStored.username;
+        }
+        
+        if(!email) {
+            email = personaStored.email;
+        }
+        
+        if(!nombre) {
+            nombre = personaStored.nombre;
+        }
+        
+        if(!password) {
+            password = personaStored.password;
+        } else {
+            password = await passwordController.hashPassword(password)
+        }
+        
+        const persona = {
+            username,
+            email,
+            nombre,
+            password
+        }
+
+        const result = await prisma.persona.update({
+            data: persona,
+            where: {
+                id
+            }
+        });
+        res.json(result);
+    } catch (error) {
+        handleError(error, res);
+        return;
+    }
+});
+
+exports.app = app;
 
 function handleError(error, res) {
     console.log(error);
@@ -92,12 +241,6 @@ function handleError(error, res) {
             });
             break;
 
-        case undefined:
-            res.status(500).json({
-                error: `Error de conexión a la base de datos`,
-            });
-            break;
-
         default:
             res.status(500).json({
                 error: {
@@ -105,6 +248,7 @@ function handleError(error, res) {
                     message:
                         "Unhandled error. See https://www.prisma.io/docs/reference/api-reference/error-reference#error-codes for more info.",
                 },
+                code: "U0001"
             });
     }
 }

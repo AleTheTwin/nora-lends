@@ -6,12 +6,10 @@ const prisma = new PrismaClient();
 
 exports.ensureAuthenticated = async function (req, res, next) {
     if (!req.headers.authorization) {
-        return res
-            .status(401)
-            .json({
-                error: "Tu petición no tiene cabecera de autorización",
-                code: "T1003",
-            });
+        return res.status(401).json({
+            error: "Tu petición no tiene cabecera de autorización",
+            code: "T1003",
+        });
     }
 
     var token = req.headers.authorization.split(" ")[1];
@@ -46,22 +44,23 @@ exports.ensureAuthenticated = async function (req, res, next) {
             return;
         }
     } catch (err) {
-        console.log(err)
-        if(!err) {
+        console.log(err);
+        if (!err) {
             res.status(500).json({
                 error: "Error desconocido",
-                code: "0"
-            })
+                code: "0",
+            });
             return;
         }
-        if(!err.code) {
+        if (!err.code) {
             res.status(500).json({
                 error: err.message,
-                code: err.code
-            })
+                code: err.code,
+            });
             return;
         }
     }
-    req.user = payload.sub;
+    req.user = payload.subscriber;
+    console.log(`Request received from ${req.user.username}`);
     next();
 };

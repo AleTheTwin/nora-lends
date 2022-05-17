@@ -40,6 +40,12 @@ CREATE TABLE "Evento" (
     CONSTRAINT "Evento_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "token" (
+    "id" TEXT NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT false
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Usuario_username_key" ON "Usuario"("username");
 
@@ -48,6 +54,9 @@ CREATE UNIQUE INDEX "Persona_username_key" ON "Persona"("username");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Persona_email_key" ON "Persona"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "token_id_key" ON "token"("id");
 
 -- AddForeignKey
 ALTER TABLE "Nota" ADD CONSTRAINT "Nota_autorId_fkey" FOREIGN KEY ("autorId") REFERENCES "Persona"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
