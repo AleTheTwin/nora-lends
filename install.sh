@@ -6,27 +6,27 @@
 
 #!/bin/sh
 
-alias reset='echo "\033[0m"'
-alias cyan='echo "\033[36m"'
-alias green='echo "\033[32m"'
-alias yellow='echo "\033[33m"'
-alias magenta='echo "\033[35m"'
-alias blue='echo "\033[34m"'
-alias red='echo "\033[31m"'
+reset="\033[0m"
+cyan="\033[36m"
+green="\033[32m"
+yellow="\033[33m"
+magenta="\033[35m"
+blue="\033[34m"
+red="\033[31m"
 
 
-reset "\n"
-cyan "Installing Nora Lends Services"
+printf "${reset}\n"
+printf "${cyan}Installing Nora Lends Services"
 
-reset "\n"
-reset "Enter the usernme for the database user: default [admin]"
+printf "${reset}\n"
+printf "${reset}Enter the usernme for the database user: default [admin]"
 read DB_USER
 
 if [ "$DB_USER" = "" ]; then
     DB_USER=admin
 fi
 
-reset "Enter the password for the database user: default [admin]"
+printf "${reset}Enter the password for the database user: default [admin]"
 read DB_PASSWORD
 
 if [ "$DB_PASSWORD" = "" ]; then
@@ -34,7 +34,7 @@ if [ "$DB_PASSWORD" = "" ]; then
 fi
 
 
-reset "Enter the port for the api users: default [8080]"
+printf "${reset}Enter the port for the api users: default [8080]"
 read PORT
 
 if [ "$PORT" = "" ]; then
@@ -67,32 +67,32 @@ cp .env usuarios-api/
 
 
 docker-compose up -d --build postgres
-reset "\n"
-cyan "Waiting for the postgres service to come online..."
+printf "${reset}\n"
+printf "${cyan}Waiting for the postgres service to come online..."
 sleep 5
 
-reset "\n"
-cyan "Installing node modules..."
+printf "${reset}\n"
+printf "${cyan}Installing node modules..."
 cd usuarios-api
 
 docker run -it --rm -w /app -v $(pwd):/app node:16 npm i
 
-reset "\n"
-cyan "Creating database..."
+printf "${reset}\n"
+printf "${cyan}Creating database..."
 npx prisma migrate dev --name init
 
-cyan "Generating Prisma Client for docker environment..."
+printf "${cyan}Generating Prisma Client for docker environment..."
 docker run -it --rm -w /app -v $(pwd):/app node:16 npm run generate
 
-reset "\n"
-reset "Enter the usernme for the admin user: default [admin]"
+printf "${reset}\n"
+printf "${reset}Enter the usernme for the admin user: default [admin]"
 read USERNAME
 
 if [ "$USERNAME" = "" ]; then
     USERNAME=admin
 fi
 
-reset "Enter the password for the admin user: default [admin]"
+printf "${reset}Enter the password for the admin user: default [admin]"
 read PASSWORD
 
 if [ "$PASSWORD" = "" ]; then
@@ -101,16 +101,17 @@ fi
 
 docker run -it --rm --network="host" -w /app -v $(pwd):/app node:16 node create-user --username $USERNAME --password $PASSWORD
 
-reset "\n"
+printf "${reset}\n"
 
-cyan "Shutting down postgres service..."
+printf "${cyan}Shutting down postgres service..."
 docker-compose down
-reset "\n"
-green "Install completed"
-reset
-reset "You may run this service with the command"
-reset
-reset "\t$"$(blue "docker-compose up -d")
-reset
+printf "${reset}\n"
+printf "${green}Install completed"
+
+printf "${reset}\n"
+printf "${reset}You may run this service with the command"
+printf "${reset}\n"
+printf "${reset}\t$ ${blue}docker-compose up -d"
+printf "${reset}\n"
 
 
