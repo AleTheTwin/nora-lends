@@ -83,7 +83,9 @@ docker run -it --rm -w /app -v $(pwd):/app node:16 npm i
 
 printf "${reset}\n"
 printf "${cyan}Creating database..."
-npx prisma migrate dev --name init
+
+# npx prisma migrate dev --name init
+docker run -it --rm --network="host" -w /app -v $(pwd):/app node:16 npx prisma migrate dev --name init
 
 printf "${cyan}Generating Prisma Client for docker environment...\n"
 docker run -it --rm -w /app -v $(pwd):/app node:16 npm run generate
