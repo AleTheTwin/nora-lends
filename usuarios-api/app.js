@@ -47,7 +47,7 @@ app.post("/login", async (req, res) => {
         ) {
             res.status(400).json({
                 error: "Credenciales incorrectas",
-                code: "C10001"
+                code: "C10001",
             });
             return;
         }
@@ -101,7 +101,7 @@ app.get("/personas/", ensureAuthenticated, async (req, res) => {
 app.get("/personas/:id", ensureAuthenticated, async (req, res) => {
     const usuario = req.user;
     const { id } = req.params;
-    if(!id) {
+    if (!id) {
         res.status(500).json({
             error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
             code: `P0001`,
@@ -117,16 +117,16 @@ app.get("/personas/:id", ensureAuthenticated, async (req, res) => {
                 username: true,
             },
             where: {
-                id
-            }
+                id,
+            },
         });
-        if ( ! persona ) {
+        if (!persona) {
             res.status(404).json({
-                error: `Usuario con id ${id} no encontrado.`,
-                code: "R0001"
+                error: `Persona con id ${id} no encontrado.`,
+                code: "R0001",
             });
             return;
-        } 
+        }
         res.json(persona);
     } catch (error) {
         handleError(error, res);
@@ -150,12 +150,12 @@ app.post("/personas/", ensureAuthenticated, async (req, res) => {
         username,
         email,
         nombre,
-        password: await passwordController.hashPassword(password)
-    }
+        password: await passwordController.hashPassword(password),
+    };
 
     try {
         const result = await prisma.persona.create({
-            data: persona
+            data: persona,
         });
         res.json(result);
     } catch (error) {
@@ -166,7 +166,7 @@ app.post("/personas/", ensureAuthenticated, async (req, res) => {
 
 app.put("/personas/:id", ensureAuthenticated, async (req, res) => {
     const usuario = req.user;
-    const { id } = req.params
+    const { id } = req.params;
     var { username, email, nombre, password } = req.body;
 
     if (!id || (!username && !email && !nombre && !password)) {
@@ -180,40 +180,83 @@ app.put("/personas/:id", ensureAuthenticated, async (req, res) => {
     try {
         const personaStored = await prisma.persona.findUnique({
             where: {
-                id
-            }
+                id,
+            },
         });
-        
-        if(!username) {
+
+        if (!persona) {
+            res.status(404).json({
+                error: `Persona con id ${id} no encontrado.`,
+                code: "R0001",
+            });
+            return;
+        }
+
+        if (!username) {
             username = personaStored.username;
         }
-        
-        if(!email) {
+
+        if (!email) {
             email = personaStored.email;
         }
-        
-        if(!nombre) {
+
+        if (!nombre) {
             nombre = personaStored.nombre;
         }
-        
-        if(!password) {
+
+        if (!password) {
             password = personaStored.password;
         } else {
-            password = await passwordController.hashPassword(password)
+            password = await passwordController.hashPassword(password);
         }
-        
+
         const persona = {
             username,
             email,
             nombre,
-            password
-        }
+            password,
+        };
 
         const result = await prisma.persona.update({
             data: persona,
             where: {
-                id
-            }
+                id,
+            },
+        });
+        res.json(result);
+    } catch (error) {
+        handleError(error, res);
+        return;
+    }
+});
+
+app.delete("/personas/:id", ensureAuthenticated, async (req, res) => {
+    const usuario = req.user;
+    const { id } = req.params;
+    if (!id) {
+        res.status(500).json({
+            error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
+            code: `P0001`,
+        });
+        return;
+    }
+    try {
+        const persona = await prisma.persona.findUnique({
+            where: {
+                id,
+            },
+        });
+        if (!persona) {
+            res.status(404).json({
+                error: `Persona con id ${id} no encontrado.`,
+                code: "R0001",
+            });
+            return;
+        }
+        const result = await prisma.persona.delete({
+            where: {
+                id,
+            },
         });
         res.json(result);
     } catch (error) {
@@ -226,29 +269,16 @@ exports.app = app;
 
 function handleError(error, res) {
     console.log(error);
-    switch (error.code) {
-        case "P1000":
-            res.status(500).json({
-                error: "Error de autenticación con la base de datos",
-                code: error.code,
-            });
-            break;
 
-        case "P1010":
-            res.status(500).json({
-                error: `Acceso denegado para el usuario ${error.database_user} a la base de datos ${error.database_name}`,
-                code: error.code,
-            });
-            break;
-
-        default:
-            res.status(500).json({
-                error: {
-                    ...error,
-                    message:
-                        "Unhandled error. See https://www.prisma.io/docs/reference/api-reference/error-reference#error-codes for more info.",
-                },
-                code: "U0001"
-            });
+    if (error.code) {
+        res.status(500).json({
+            error: "Unhandled error. See https://www.prisma.io/docs/reference/api-reference/error-reference#error-codes for more info.",
+            code: error.code,
+        });
+        return;
     }
+    res.status(500).json({
+        error: error.message,
+        code: "U0001",
+    });
 }

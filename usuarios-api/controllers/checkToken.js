@@ -45,17 +45,17 @@ exports.ensureAuthenticated = async function (req, res, next) {
         }
     } catch (err) {
         console.log(err);
-        if (!err) {
+        if (err.code) {
             res.status(500).json({
-                error: "Error desconocido",
-                code: "0",
+                error: err.message,
+                code: err.code,
             });
             return;
         }
         if (!err.code) {
             res.status(500).json({
-                error: err.message,
-                code: err.code,
+                error: "Error desconocido, vuelva a intentarlo",
+                code: "U0002",
             });
             return;
         }
