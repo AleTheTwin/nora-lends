@@ -184,7 +184,7 @@ app.put("/personas/:id", ensureAuthenticated, async (req, res) => {
             },
         });
 
-        if (!persona) {
+        if (!personaStored) {
             res.status(404).json({
                 error: `Persona con id ${id} no encontrado.`,
                 code: "R0001",
