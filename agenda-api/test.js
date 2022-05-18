@@ -1,32 +1,27 @@
 const { PrismaClient} = require("@prisma/client");
 const prisma=new PrismaClient();
 async function juas(){
-    /*var persona=await prisma.persona.create({data:{
-        username:"amary",
+    var persona=await prisma.persona.create({data:{
+        username:"nora",
         password:"123456",
-        email:"amary@emanoxxx.com",
-        nombre:"amary"
+        email:"nora@emanoxxx.com",
+        nombre:"nora"
     }}).catch(err=>{
 
-    })*/
+    })
     await prisma.evento.create({data: {
-        titulo: "Hola1",
+        titulo: "putifiesta del ale",
         fechaDeInicio:"2020-03-19T14:21:00+02:00",
         fechaDeFinalizacion:"2020-04-19T14:21:00+02:00",
-        autorId:'ae6a3f5e-37b6-47da-9c6e-8004bfb3b210'
+        autorId:'cd821ca3-c8d5-4637-bbcf-0f02431d3530'
     }}).catch(err=>{
         console.log(err)
     })
-    /*var personas=await prisma.persona.findMany();
-    console.log(personas);*/
-    var transaccion=await prisma.$transaction([
-        prisma.evento.delete({where: {
-            autorId:'ae6a3f5e-37b6-47da-9c6e-8004bfb3b210'
-        }}),
+    var personas=await prisma.persona.findMany();
+    console.log(personas);
         prisma.persona.delete({where: {
-            id:"ae6a3f5e-37b6-47da-9c6e-8004bfb3b210"
+            id:'cd821ca3-c8d5-4637-bbcf-0f02431d3530'
         }})
-    ])
     console.log(transaccion)
     var eventos=await prisma.evento.findMany();
     console.log(eventos);
