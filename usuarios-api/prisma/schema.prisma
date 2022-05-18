@@ -29,9 +29,9 @@ model Nota {
   titulo    String
   contenido String
   autorId   String
-  autor     Persona @relation(references: [id], fields: [autorId])
+  autor     Persona @relation(references: [id], fields: [autorId], onDelete: Cascade, onUpdate: Cascade)
   eventoId  String
-  evento    Evento  @relation(fields: [eventoId], references: [id])
+  evento    Evento  @relation(fields: [eventoId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Evento {
@@ -41,7 +41,7 @@ model Evento {
   fechaDeFinalizacion DateTime
   autorId             String
   notas               Nota[]
-  autor               Persona  @relation(references: [id], fields: [autorId])
+  autor               Persona  @relation(references: [id], fields: [autorId], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model token {
