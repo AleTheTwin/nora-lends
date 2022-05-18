@@ -6,3 +6,6 @@ db
 .cer
 .DS_STORE
 .vscode
+*.zip
+*.log
+*.key
