@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
     });
 });
 
-app.post("/login", async (req, res) => {
+app.post("/loginAdmin", async (req, res) => {
     const { username, password } = req.body;
 
     if (!username || !password) {
@@ -56,6 +56,51 @@ app.post("/login", async (req, res) => {
             username: usuario.username,
             id: usuario.id,
             token: await createToken(usuario),
+        });
+    } catch (e) {
+        handleError(e, res);
+        return;
+    }
+});
+
+app.post("/login", async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        res.status(500).json({
+            error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
+            code: `P0001`,
+        });
+        return;
+    }
+
+    try {
+        const persona = await prisma.persona.findUnique({
+            where: {
+                username,
+            },
+        });
+
+        if (
+            !persona ||
+            !(await passwordController.passwordVerify(
+                password,
+                persona.password
+            ))
+        ) {
+            res.status(400).json({
+                error: "Credenciales incorrectas",
+                code: "C10001",
+            });
+            return;
+        }
+
+        res.json({
+            username: persona.username,
+            id: persona.id,
+            email: persona.email,
+            nombre: persona.nombre,
+            token: await createToken(persona),
         });
     } catch (e) {
         handleError(e, res);
