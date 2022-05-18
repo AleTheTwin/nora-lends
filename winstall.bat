@@ -9,8 +9,7 @@
 echo.
 echo Installing Nora Lends Services
 
-set pwd=%~dp0
-echo %pwd%
+
 
 echo.
 
@@ -38,7 +37,7 @@ echo API_KEY=%API_KEY% >> .env
 echo DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/mydb?schema=public" >> .env
 
 xcopy /y/f .env usuarios-api/
-
+xcopy /y/f .env agenda-api/
 
 docker-compose up -d --build postgres
 
@@ -47,16 +46,16 @@ TIMEOUT /t 5
 
 echo Installing node modules...
 cd usuarios-api
-
-docker run -it --rm -w /app -v %pwd%:/app node:16 npm i
-
+set pwd=%~dp0
+echo %pwd%
+docker run -it --rm -w /app -v %pwd%/usuarios-api/:/app node:16 npm i
 echo  Creating database...
 
-npx prisma migrate dev --name init
-
+@REM npx prisma migrate dev --name init
+docker run -it --rm --network="host" -w /app -v %pwd%/usuarios-api/:/app node:16 npx prisma migrate dev --name init
 echo Generating Prisma Client for docker environment...
 
-docker run -it --rm -w /app -v %pwd%:/app node:16 npm run generate
+docker run -it --rm -w /app -v %pwd%/usuarios-api/:/app node:16 npm run generate
 
 set /p USERNAME2="Enter the username for the admin user: default [admin]: "
 IF [%USERNAME2%] == [] set USERNAME2=admin
@@ -66,7 +65,7 @@ IF [%PASSWORD%] == [] set PASSWORD=admin
 
 echo %USERNAME2%:%PASSWORD%
 
-docker run -it --rm --network="host" -w /app -v %pwd%:/app node:16 node create-user --username %USERNAME2% --password %PASSWORD%
+docker run -it --rm --network="host" -w /app -v %pwd%/usuarios-api/:/app node:16 node create-user --username %USERNAME2% --password %PASSWORD%
 
 
 echo Shutting down postgres service...
