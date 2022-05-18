@@ -97,21 +97,6 @@
             "context_set": ""
         },
         {
-            "tag": "get-event",
-            "patterns": [
-                "que eventos tengo",
-                "muestra mis eventos",
-                "lista mis eventos",
-                "dime mis eventos",
-                "dime mis recordatorios",
-                "muestrame un evento",
-                "enséñame mis eventos"
-            ],
-            "responses": [
-                "¿Quieres una fecha en específico o todos tus eventos?"
-            ]
-        },
-        {
             "tag": "get-event-today",
             "patterns": [
                 "muestrame todas mis citas de hoy",

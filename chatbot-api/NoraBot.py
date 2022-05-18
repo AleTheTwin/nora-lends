@@ -124,7 +124,7 @@ def chat():
                 if tg['tag'] == tag:
                     responses = tg['responses']
             # print(tag)
-            print(random.choice(responses) + " [ " + str(results[0][results_index]) + " ]")
+            print(tag + " [ " + str(results[0][results_index]) + " ]")
 
 def predict(mensaje):
 
