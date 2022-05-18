@@ -25,6 +25,14 @@ services:
             - DB_HOST=postgres
         depends_on:
             - postgres
+    chat:
+        image: alethetwin/python-tensorflow
+        volumes:
+            - ./chatbot-api:/app
+        working_dir: /app/
+        ports:
+            - 8000:8000
+        command: "bash run.sh"
 volumes:
     postgres:  
 
