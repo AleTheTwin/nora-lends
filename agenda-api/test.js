@@ -1,7 +1,7 @@
 const { PrismaClient} = require("@prisma/client");
 const prisma=new PrismaClient();
 async function juas(){
-    var persona=await prisma.persona.create({data:{
+    /*var persona=await prisma.persona.create({data:{
         username:"nora",
         password:"123456",
         email:"nora@emanoxxx.com",
@@ -16,13 +16,11 @@ async function juas(){
         autorId:'cd821ca3-c8d5-4637-bbcf-0f02431d3530'
     }}).catch(err=>{
         console.log(err)
-    })
+    })*/
+    await prisma.persona.deleteMany()
+
     var personas=await prisma.persona.findMany();
     console.log(personas);
-        prisma.persona.delete({where: {
-            id:'cd821ca3-c8d5-4637-bbcf-0f02431d3530'
-        }})
-    console.log(transaccion)
     var eventos=await prisma.evento.findMany();
     console.log(eventos);
 

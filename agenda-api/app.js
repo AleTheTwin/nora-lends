@@ -27,7 +27,10 @@ app.get("/eventos/", ensureAuthenticated, async (req, res) => {
     try {
         const eventos = await prisma.evento.findMany({
             where:{
-                authorid:usuario.id
+                autorId:usuario.id
+            },
+            include:{
+                notas:true
             }
         });
         res.json(eventos);
@@ -48,25 +51,22 @@ app.get("/eventos/:id", ensureAuthenticated, async (req, res) => {
         return;
     }
     try {
-        const evento = await prisma.evento.findUnique({
-            select: {
-                id: true,
-                nombre: true,
-                email: true,
-                username: true,
+        const eventos = await prisma.evento.findUnique({
+            where:{
+                id
             },
-            where: {
-                id,
-            },
+            include:{
+                notas:true
+            }
         });
-        if (!evento) {
+        if(!eventos){
             res.status(404).json({
                 error: `evento con id ${id} no encontrado.`,
-                code: "R0001",
+                code: `R0001`,
             });
             return;
         }
-        res.json(evento);
+        res.json(eventos);
     } catch (error) {
         handleError(error, res);
         return;
@@ -75,9 +75,8 @@ app.get("/eventos/:id", ensureAuthenticated, async (req, res) => {
 
 app.post("/eventos/", ensureAuthenticated, async (req, res) => {
     const usuario = req.user;
-    const { username, email, nombre, password } = req.body;
-
-    if (!username || !email || !nombre || !password) {
+    const { titulo, fechaDeInicio, fechaDeFinalizacion} = req.body;
+    if (!titulo || !fechaDeInicio || !fechaDeFinalizacion) {
         res.status(500).json({
             error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
             code: `P0001`,
@@ -86,10 +85,10 @@ app.post("/eventos/", ensureAuthenticated, async (req, res) => {
     }
 
     const evento = {
-        username,
-        email,
-        nombre,
-        password: await passwordController.hashPassword(password),
+        titulo,
+        fechaDeInicio,
+        fechaDeFinalizacion,
+        autorId:usuario.id
     };
 
     try {
@@ -106,9 +105,9 @@ app.post("/eventos/", ensureAuthenticated, async (req, res) => {
 app.put("/eventos/:id", ensureAuthenticated, async (req, res) => {
     const usuario = req.user;
     const { id } = req.params;
-    var { username, email, nombre, password } = req.body;
+    const { titulo, fechaDeInicio, fechaDeFinalizacion} = req.body;
 
-    if (!id || (!username && !email && !nombre && !password)) {
+    if (!id || (!titulo && !fechaDeInicio && !fechaDeFinalizacion)) {
         res.status(500).json({
             error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
             code: `P0001`,
@@ -131,29 +130,22 @@ app.put("/eventos/:id", ensureAuthenticated, async (req, res) => {
             return;
         }
 
-        if (!username) {
-            username = eventoStored.username;
+        if (!titulo) {
+            titulo = eventoStored.titulo;
         }
 
-        if (!email) {
-            email = eventoStored.email;
+        if (!fechaDeInicio) {
+            fechaDeInicio = eventoStored.fechaDeInicio;
         }
 
-        if (!nombre) {
-            nombre = eventoStored.nombre;
-        }
-
-        if (!password) {
-            password = eventoStored.password;
-        } else {
-            password = await passwordController.hashPassword(password);
+        if (!fechaDeFinalizacion) {
+            fechaDeFinalizacion = eventoStored.fechaDeFinalizacion;
         }
 
         const evento = {
-            username,
-            email,
-            nombre,
-            password,
+            titulo,
+            fechaDeInicio,
+            fechaDeFinalizacion
         };
 
         const result = await prisma.evento.update({
