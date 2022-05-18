@@ -8,6 +8,7 @@ logging.basicConfig(filename="archivarlog.log",level=logging.DEBUG)
 
 chat=ChatBot("Nora",
     storage_adapter='chatterbot.storage.SQLStorageAdapter',
+    database="./db.sqlite3",
     logic_adapters=[
         {
             'import_path': 'chatterbot.logic.BestMatch',

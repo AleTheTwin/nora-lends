@@ -15,7 +15,7 @@ element from the user.
 bot = ChatBot(
     'Nora',
     storage_adapter='chatterbot.storage.SQLStorageAdapter',
-    database_uri=None,
+    database="./db.sqlite3",
     logic_adapters=[
         'chatterbot.logic.BestMatch'
     ]
