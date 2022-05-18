@@ -33,6 +33,19 @@ services:
         ports:
             - 8000:8000
         command: "bash run.sh"
+    lamp:
+        image: alethetwin/lamp:amd64
+        ports:
+            - 80:80
+            - 3306:3306
+        volumes: 
+            - ./cliente/db:/var/lib/mysql
+            - ./cliente/app:/app
+        command: 
+            - /run.sh
+        environment:
+            MYSQL_ADMIN_PASS: 123456
+            PHP_VERSION: 8.1
 volumes:
     postgres:  
 

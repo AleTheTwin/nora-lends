@@ -199,7 +199,7 @@ def predict_response(mensaje):
     results = model.predict([bag_of_words(mensaje, words)])
     results_index = numpy.argmax(results)
     tag = labels[results_index]
-    if results[0][results_index] < 0.999:
+    if results[0][results_index] < 0.8:
         print("No sé como responder a eso")
         print(results[0][results_index])
         return "No sé como responder a eso"
@@ -257,5 +257,5 @@ if __name__ == '__main__':
     logging.info("listening to http://127.0.0.1:8000")
     logging.info("wsdl is at: http://localhost:8000/?wsdl")
 
-    server = make_server('chat', 8000, wsgi_application)
+    server = make_server('localhost', 8000, wsgi_application)
     server.serve_forever()

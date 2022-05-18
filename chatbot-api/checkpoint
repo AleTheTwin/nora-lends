@@ -1,2 +1,2 @@
-model_checkpoint_path: "/Users/alethetwin/Documents/projects/chatterbot/model.tflearn"
-all_model_checkpoint_paths: "/Users/alethetwin/Documents/projects/chatterbot/model.tflearn"
+model_checkpoint_path: "/Users/alethetwin/Documents/ti/nora-lends/chatbot-api/model.tflearn"
+all_model_checkpoint_paths: "/Users/alethetwin/Documents/ti/nora-lends/chatbot-api/model.tflearn"
