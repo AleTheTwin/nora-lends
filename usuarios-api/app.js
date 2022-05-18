@@ -179,7 +179,7 @@ app.get("/personas/:id", ensureAuthenticated, async (req, res) => {
     }
 });
 
-app.post("/personas/", ensureAuthenticated, async (req, res) => {
+app.post("/personas/", async (req, res) => {
     const usuario = req.user;
     const { username, email, nombre, password } = req.body;
 
