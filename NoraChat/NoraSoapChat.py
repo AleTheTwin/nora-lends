@@ -9,7 +9,7 @@ from chatterbot.conversation import Statement
 
 chat=ChatBot("Nora",
         storage_adapter='chatterbot.storage.SQLStorageAdapter',
-        
+        database="./db.sqlite3",
         logic_adapters=[
             'chatterbot.logic.BestMatch',
         ],
