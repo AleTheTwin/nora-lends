@@ -4,37 +4,39 @@ const { ensureAuthenticated } = require("./controllers/checkToken");
 
 const documentacionUrl = "http://noralends.host/docs";
 
-const cors = require('cors')
+const cors = require("cors");
 
 const prisma = new PrismaClient();
 
 const app = express();
 
 app.use(express.json());
-app.use(cors())
-app.use(function(req, res, next) {
+app.use(cors());
+app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept"
+    );
     next();
-  });
+});
 app.get("/", (req, res) => {
     res.json({
         message: "Nora Lends - Events api",
     });
 });
 
-
 app.get("/eventos/", ensureAuthenticated, async (req, res) => {
     const usuario = req.user;
 
     try {
         const eventos = await prisma.evento.findMany({
-            where:{
-                autorId:usuario.id
+            where: {
+                autorId: usuario.id,
             },
-            include:{
-                notas:true
-            }
+            include: {
+                notas: true,
+            },
         });
         res.json(eventos);
     } catch (error) {
@@ -55,14 +57,14 @@ app.get("/eventos/:id", ensureAuthenticated, async (req, res) => {
     }
     try {
         const eventos = await prisma.evento.findUnique({
-            where:{
-                id
+            where: {
+                id,
             },
-            include:{
-                notas:true
-            }
+            include: {
+                notas: true,
+            },
         });
-        if(!eventos){
+        if (!eventos) {
             res.status(404).json({
                 error: `evento con id ${id} no encontrado.`,
                 code: `R0001`,
@@ -78,7 +80,7 @@ app.get("/eventos/:id", ensureAuthenticated, async (req, res) => {
 
 app.post("/eventos/", ensureAuthenticated, async (req, res) => {
     const usuario = req.user;
-    const { titulo, fechaDeInicio, fechaDeFinalizacion} = req.body;
+    const { titulo, fechaDeInicio, fechaDeFinalizacion } = req.body;
     if (!titulo || !fechaDeInicio || !fechaDeFinalizacion) {
         res.status(500).json({
             error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
@@ -91,7 +93,7 @@ app.post("/eventos/", ensureAuthenticated, async (req, res) => {
         titulo,
         fechaDeInicio,
         fechaDeFinalizacion,
-        autorId:usuario.id
+        autorId: usuario.id,
     };
 
     try {
@@ -108,7 +110,7 @@ app.post("/eventos/", ensureAuthenticated, async (req, res) => {
 app.put("/eventos/:id", ensureAuthenticated, async (req, res) => {
     const usuario = req.user;
     const { id } = req.params;
-    const { titulo, fechaDeInicio, fechaDeFinalizacion} = req.body;
+    const { titulo, fechaDeInicio, fechaDeFinalizacion } = req.body;
 
     if (!id || (!titulo && !fechaDeInicio && !fechaDeFinalizacion)) {
         res.status(500).json({
@@ -123,9 +125,9 @@ app.put("/eventos/:id", ensureAuthenticated, async (req, res) => {
             where: {
                 id,
             },
-            include:{
-                notas:true
-            }
+            include: {
+                notas: true,
+            },
         });
 
         if (!eventoStored) {
@@ -151,7 +153,7 @@ app.put("/eventos/:id", ensureAuthenticated, async (req, res) => {
         const evento = {
             titulo,
             fechaDeInicio,
-            fechaDeFinalizacion
+            fechaDeFinalizacion,
         };
 
         const result = await prisma.evento.update({

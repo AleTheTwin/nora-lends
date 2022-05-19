@@ -11,7 +11,7 @@ exports.createToken = function (usuario) {
         expiration: moment().add(30, "days").unix(),
     };
     const token = jwt.encode(payload, apikey);
-    return new Promise((resolve, rejec) => {
+    return new Promise((resolve, reject) => {
         prisma.token
             .create({
                 data: {

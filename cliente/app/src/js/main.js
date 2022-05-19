@@ -1,24 +1,93 @@
-const host = "http://mac-mini-de-ale.local";
+const host = "http://home.alethetwin.online";
 
-if(token != undefined) {
-    let url = `${host}:8081/eventos`
-    axios.get(url, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-            "Access-Control-Allow-Origin": "*"
+var eventos = [];
+var eventosFiltrados = eventos;
+
+if (token != undefined) {
+    let url = `${host}:4001/eventos`;
+    axios
+        .get(url, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Access-Control-Allow-Origin": "*",
+            },
+        })
+        .then((response) => {
+            eventos = response.data
+            eventosFiltrados = eventos;
+            // eventos.forEach((evento) => {
+            //     insertaEvento(evento);
+            // });
+            loadEventos();
+        })
+        .catch((error) => {
+            alert(error);
+        });
+}
+
+$("#search").keyup((event) => {
+    let search = $("#search").val().toLowerCase();
+    if (search == "") {
+        console.log("hola");
+        eventosFiltrados = eventos;
+        loadEventos();
+        return;
+    }
+    // for (let i = 0; i < eventos.length; i++) {
+    //     eventosFiltrados = [];
+    //     if (eventos[i].titulo.includes(search)) {
+    //         eventosFiltrados.push(eventos[i]);
+    //     }
+    // }
+    eventosFiltrados = eventos.filter(evento => {
+        return evento.titulo.toLowerCase().includes(search)
+    })
+    console.log(eventosFiltrados);
+    loadEventos();
+});
+
+$("#search-form").submit((event) => {
+    event.preventDefault();
+    let search = $("#search").val().toLowerCase();
+    console.log(search);
+    if (search == "") {
+        eventosFiltrados = eventos;
+        return;
+    }
+    eventosFiltrados = eventos.filter((event) => {
+        return event.titulo.includes(search);
+    });
+    loadEventos();
+});
+
+
+
+$("#chat-form").submit((event) => {
+    event.preventDefault();
+    let chat = $("#chat").val().toLowerCase();
+    axios.get(`/functions/get_intent.php?mensaje=${chat}`)
+    .then(({data}) => {
+        switch(data.intent) {
+            case "get-event-today":
+                let hoy = new Date()
+                let hoyIso = hoy.toISOString()
+                moment(eventos[0].fechaDeInicio)
+                console.log(hoyIso);
         }
     })
-    .then((response) => {
-        let eventos = response.data
-        console.log(eventos);
-        eventos.forEach(evento => {
-            insertaEvento(evento)
-        })
+    .catch(err => {
+        console.log(err);
     })
-    .catch(error => {
-        alert(error);
-    })
+});
+
+async function loadEventos() {
+    $("#main").html("");
+    eventosFiltrados.forEach((evento) => {
+        insertaEvento(evento);
+    });
 }
+
+// loadEventos();
 
 function ocultarAlerta() {
     $("#alerta").addClass("visually-hidden");
@@ -29,18 +98,10 @@ function mostrarAlerta(mensaje) {
     $("#alerta").html(mensaje);
 }
 
-let evento = {
-    titulo: "jeje",
-    fechaDeInicio: "asdfasfdasdfas",
-    fechaDeFinalizacion: "alksdjalsdjasd",
-    notas: [{ titulo: "nota1", contenido: "el contenido de la nota jeje" }],
-};
-
-
 function insertaEvento(evento) {
-    let main = document.getElementById('main');
+    let main = document.getElementById("main");
     let tarjeta = tarjetaEvento(evento);
-    main.appendChild(tarjeta)
+    main.appendChild(tarjeta);
 }
 
 function tarjetaEvento(evento) {
@@ -69,7 +130,7 @@ function tarjetaEvento(evento) {
     let eventofinalizacionTag = document.createElement("strong");
     eventofinalizacionTag.innerHTML = "finalizacion: ";
     let eventofinalizacionData = document.createElement("small");
-    eventofinalizacionData.innerHTML = evento.fechaDefinalizacion;
+    eventofinalizacionData.innerHTML = evento.fechaDeFinalizacion;
     eventofinalizacion.appendChild(eventofinalizacionTag);
     eventofinalizacion.appendChild(eventofinalizacionData);
 
@@ -119,7 +180,9 @@ function tarjetaEvento(evento) {
 
     notasSeccion.appendChild(listaDeNotas);
 
-    card.appendChild(notasSeccion);
+    if (evento.notas.length > 0) {
+        card.appendChild(notasSeccion);
+    }
 
     let opciones = document.createElement("div");
     opciones.classList.add("card-body");
@@ -135,9 +198,42 @@ function tarjetaEvento(evento) {
     btnBorrar.classList.add("btn-danger");
     btnBorrar.innerHTML = "Borrar";
 
+    let btnAddNota = document.createElement("button");
+    btnAddNota.classList.add("btn");
+    btnAddNota.classList.add("btn-success");
+    btnAddNota.innerHTML = "+ nota";
+
+    opciones.appendChild(btnAddNota);
     opciones.appendChild(btnEditar);
     opciones.appendChild(btnBorrar);
+
+
 
     card.appendChild(opciones);
     return card;
 }
+
+if (!Date.prototype.toISOString) {
+    (function() {
+  
+      function pad(number) {
+        if (number < 10) {
+          return '0' + number;
+        }
+        return number;
+      }
+  
+      Date.prototype.toISOString = function() {
+        return this.getUTCFullYear() +
+          '-' + pad(this.getUTCMonth() + 1) +
+          '-' + pad(this.getUTCDate()) +
+          'T' + pad(this.getUTCHours()) +
+          ':' + pad(this.getUTCMinutes()) +
+          ':' + pad(this.getUTCSeconds()) +
+          '.' + (this.getUTCMilliseconds() / 1000).toFixed(3).slice(2, 5) +
+          'Z';
+      };
+  
+    }());
+  }
+  

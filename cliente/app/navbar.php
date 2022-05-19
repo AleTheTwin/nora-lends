@@ -19,8 +19,12 @@
                 token = "<?php echo $_SESSION["token"]; ?>"
                 const username = "<?php echo $_SESSION["username"]; ?>"
             </script>
-            <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+            <form id="chat-form" class="d-flex" role="search">
+                <input class="form-control me-2" type="search" id="chat" placeholder="Dime algo" aria-label="Search">
+                <!-- <button class="btn btn-outline-success" type="submit">Send</button> -->
+            </form>
+            <form id="search-form" class="d-flex" role="search">
+                <input class="form-control me-2" type="search" id="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success" type="submit">Search</button>
                 <button style="margin-left: 10px;" class="btn btn-danger " onclick="location.href = 'functions/cerrar_sesión.php'" type="button">Salir</button>
             </form>

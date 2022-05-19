@@ -70,6 +70,7 @@ DB_USER=$DB_USER
 DB_PASSWORD=$DB_PASSWORD
 USERS_API_PORT=$USERS_API_PORT
 EVENTS_API_PORT=$EVENTS_API_PORT
+NOTES_API_PORT=$NOTES_API_PORT
 API_KEY=$API_KEY
 
 
@@ -84,6 +85,7 @@ DATABASE_URL="'"postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/mydb?sche
 " > .env
 cp .env usuarios-api/
 cp .env agenda-api/
+cp .env nota-api/
 
 
 printf "${reset}\n"
@@ -95,6 +97,7 @@ printf "${cyan}Instalando módulos de node...\n"
 
 docker run -it --rm -w /app -v $(pwd)/usuarios-api/:/app node:16 npm i
 docker run -it --rm -w /app -v $(pwd)/agenda-api/:/app node:16 npm i
+docker run -it --rm -w /app -v $(pwd)/nota-api/:/app node:16 npm i
 
 printf "${reset}\n"
 printf "${cyan}Creando base de datos..."
@@ -105,6 +108,7 @@ docker run -it --rm --network="host" -w /app -v $(pwd)/usuarios-api/:/app node:1
 printf "${cyan}Generando los clientes de prisma para los ambientes de docker...\n"
 docker run -it --rm -w /app -v $(pwd)/usuarios-api/:/app node:16 npm run generate
 docker run -it --rm -w /app -v $(pwd)/agenda-api/:/app node:16 npm run generate
+docker run -it --rm -w /app -v $(pwd)/nota-api/:/app node:16 npm run generate
 
 printf "${reset}\n"
 printf "${reset}Ingresa el nombre de usuario para el administrador de la api: default [admin]:\n"

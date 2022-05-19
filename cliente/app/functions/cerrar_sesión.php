@@ -4,4 +4,4 @@ session_start();
 $_SESSION = array();
 session_destroy();
 
-header('Location: '.$uri.'/login.php');
+header('Location: /login.php');

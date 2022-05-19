@@ -35,7 +35,22 @@ services:
         links:
             - postgres
         ports:
-            - ${EVENTS_API_PORT}:8080
+            - ${EVENTS_API_PORT}:${EVENTS_API_PORT}
+        environment:
+            - DB_HOST=postgres
+        depends_on:
+            - postgres
+    notas_api:
+        image: node:16
+        volumes: 
+            - ./nota-api:/home/node/app
+        user: node
+        working_dir: /home/node/app/
+        command: "npm start"
+        links:
+            - postgres
+        ports:
+            - ${NOTES_API_PORT}:${NOTES_API_PORT}
         environment:
             - DB_HOST=postgres
         depends_on:

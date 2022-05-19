@@ -15,4 +15,4 @@ $_SESSION["nombre"] = $nombre;
 $_SESSION["token"] = $token;
 $_SESSION["username"] = $username;
 
-header('Location: '.$uri.'/');
+header('Location: /');

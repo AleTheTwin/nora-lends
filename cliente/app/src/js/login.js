@@ -3,7 +3,7 @@
 $("#login-form").submit(async (event) => {
     event.preventDefault();
     ocultarAlerta();
-    let url = `${host}:8080/login`;
+    let url = `${host}:4000/login`;
     let usernameInput = $("#username-input").val();
     let passwordInput = $("#password-input").val();
     try {
@@ -12,7 +12,7 @@ $("#login-form").submit(async (event) => {
             password: passwordInput,
         });
         
-        location.href = `${host}/functions/save_session.php?email=${usuario.email}&id=${usuario.id}&nombre=${usuario.nombre}&token=${usuario.token}&username=${usuario.username}`;
+        location.href = `/functions/save_session.php?email=${usuario.email}&id=${usuario.id}&nombre=${usuario.nombre}&token=${usuario.token}&username=${usuario.username}`;
     } catch (error) {
         
         if (!error.response) {
