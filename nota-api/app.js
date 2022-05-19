@@ -35,7 +35,7 @@ app.get("/eventos/:eventid/notas/", ensureAuthenticated, async (req, res) => {
         const notas = await prisma.nota.findMany({
             where:{
                 autorId:usuario.id,
-                notaId:eventid
+                eventoId:eventid
             }
         });
         res.json(notas);
@@ -77,8 +77,8 @@ app.get("/notas/:id", ensureAuthenticated, async (req, res) => {
 
 app.post("/notas/", ensureAuthenticated, async (req, res) => {
     const usuario = req.user;
-    const { titulo, contenido, autorId,eventoId} = req.body;
-    if (!titulo || !contenido || !autorId ||!eventoId) {
+    const { titulo, contenido,eventoId} = req.body;
+    if (!titulo || !contenido ||!eventoId) {
         res.status(500).json({
             error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
             code: `P0001`,
@@ -89,7 +89,6 @@ app.post("/notas/", ensureAuthenticated, async (req, res) => {
     const nota = {
         titulo,
         contenido,
-        fechaDeFinalizacion,
         autorId:usuario.id,
         eventoId
     };

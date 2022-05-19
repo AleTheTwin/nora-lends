@@ -120,6 +120,9 @@ app.put("/eventos/:id", ensureAuthenticated, async (req, res) => {
             where: {
                 id,
             },
+            include:{
+                notas:true
+            }
         });
 
         if (!eventoStored) {
