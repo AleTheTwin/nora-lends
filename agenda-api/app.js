@@ -1,19 +1,22 @@
 const { PrismaClient } = require("@prisma/client");
 const express = require("express");
 const { ensureAuthenticated } = require("./controllers/checkToken");
-const { createToken } = require("./controllers/create-token");
-const passwordController = require("./controllers/password-hash");
 
 const documentacionUrl = "http://noralends.host/docs";
+
+const cors = require('cors')
 
 const prisma = new PrismaClient();
 
 const app = express();
 
 app.use(express.json());
-
-const PORT = process.env.PORT || 8080;
-
+app.use(cors())
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+  });
 app.get("/", (req, res) => {
     res.json({
         message: "Nora Lends - Events api",

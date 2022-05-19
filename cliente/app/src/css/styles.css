@@ -1,0 +1,22 @@
+#main {
+    margin-top: 66px;
+    padding-top: 15px;
+}
+#main > * {
+    margin-bottom: 15px;
+}
+#nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    /* bottom: calc(100vh - 66px); */
+    box-shadow: 1px 1px 5px -2px;
+    z-index: 100;
+}
+
+.event-box {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+}

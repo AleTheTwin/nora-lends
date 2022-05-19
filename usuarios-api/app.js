@@ -4,6 +4,8 @@ const { ensureAuthenticated } = require("./controllers/checkToken");
 const { createToken } = require("./controllers/create-token");
 const passwordController = require("./controllers/password-hash");
 
+const cors = require('cors')
+
 const documentacionUrl = "http://noralends.host/docs";
 
 const prisma = new PrismaClient();
@@ -11,6 +13,7 @@ const prisma = new PrismaClient();
 const app = express();
 
 app.use(express.json());
+app.use(cors())
 
 const PORT = process.env.PORT || 8080;
 

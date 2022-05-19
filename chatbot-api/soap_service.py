@@ -192,7 +192,7 @@ def predict(mensaje):
             if tg['tag'] == tag:
                 responses = tg['responses']
         print(random.choice(responses))
-        return tag + str(results[0][results_index])
+        return tag
 
 def predict_response(mensaje):
 
