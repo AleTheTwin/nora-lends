@@ -1,49 +1,51 @@
 const { PrismaClient } = require("@prisma/client");
 const express = require("express");
 const { ensureAuthenticated } = require("./controllers/checkToken");
+const { createToken } = require("./controllers/create-token");
+const passwordController = require("./controllers/password-hash");
 
 const documentacionUrl = "http://noralends.host/docs";
-
-const cors = require('cors')
 
 const prisma = new PrismaClient();
 
 const app = express();
 
 app.use(express.json());
-app.use(cors())
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*"); // update to match the domain you will make the request from
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
-  });
+
+const PORT = process.env.PORT || 8080;
+
 app.get("/", (req, res) => {
     res.json({
-        message: "Nora Lends - Events api",
+        message: "Nora Lends - Nota api",
     });
 });
 
 
-app.get("/eventos/", ensureAuthenticated, async (req, res) => {
+app.get("/eventos/:eventid/notas/", ensureAuthenticated, async (req, res) => {
     const usuario = req.user;
-
+    const { eventid } = req.params;
+    if (!eventid) {
+        res.status(500).json({
+            error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
+            code: `P0001`,
+        });
+        return;
+    }
     try {
-        const eventos = await prisma.evento.findMany({
+        const notas = await prisma.nota.findMany({
             where:{
-                autorId:usuario.id
-            },
-            include:{
-                notas:true
+                autorId:usuario.id,
+                eventoId:eventid
             }
         });
-        res.json(eventos);
+        res.json(notas);
     } catch (error) {
         handleError(error, res);
         return;
     }
 });
 
-app.get("/eventos/:id", ensureAuthenticated, async (req, res) => {
+app.get("/notas/:id", ensureAuthenticated, async (req, res) => {
     const usuario = req.user;
     const { id } = req.params;
     if (!id) {
@@ -54,32 +56,29 @@ app.get("/eventos/:id", ensureAuthenticated, async (req, res) => {
         return;
     }
     try {
-        const eventos = await prisma.evento.findUnique({
+        const notas = await prisma.nota.findUnique({
             where:{
-                id
-            },
-            include:{
-                notas:true
+                id:id
             }
         });
-        if(!eventos){
+        if(!notas){
             res.status(404).json({
-                error: `evento con id ${id} no encontrado.`,
+                error: `Nota con id ${id} no encontrado.`,
                 code: `R0001`,
             });
             return;
         }
-        res.json(eventos);
+        res.json(notas);
     } catch (error) {
         handleError(error, res);
         return;
     }
 });
 
-app.post("/eventos/", ensureAuthenticated, async (req, res) => {
+app.post("/notas/", ensureAuthenticated, async (req, res) => {
     const usuario = req.user;
-    const { titulo, fechaDeInicio, fechaDeFinalizacion} = req.body;
-    if (!titulo || !fechaDeInicio || !fechaDeFinalizacion) {
+    const { titulo, contenido,eventoId} = req.body;
+    if (!titulo || !contenido ||!eventoId) {
         res.status(500).json({
             error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
             code: `P0001`,
@@ -87,16 +86,16 @@ app.post("/eventos/", ensureAuthenticated, async (req, res) => {
         return;
     }
 
-    const evento = {
+    const nota = {
         titulo,
-        fechaDeInicio,
-        fechaDeFinalizacion,
-        autorId:usuario.id
+        contenido,
+        autorId:usuario.id,
+        eventoId
     };
 
     try {
-        const result = await prisma.evento.create({
-            data: evento,
+        const result = await prisma.nota.create({
+            data: nota,
         });
         res.json(result);
     } catch (error) {
@@ -105,12 +104,12 @@ app.post("/eventos/", ensureAuthenticated, async (req, res) => {
     }
 });
 
-app.put("/eventos/:id", ensureAuthenticated, async (req, res) => {
+app.put("/notas/:id", ensureAuthenticated, async (req, res) => {
     const usuario = req.user;
     const { id } = req.params;
-    const { titulo, fechaDeInicio, fechaDeFinalizacion} = req.body;
+    const { titulo, contenido} = req.body;
 
-    if (!id || (!titulo && !fechaDeInicio && !fechaDeFinalizacion)) {
+    if (!id || (!titulo && !contenido)) {
         res.status(500).json({
             error: `Parámetros incompletos. Consulta la documtación en ${documentacionUrl}.`,
             code: `P0001`,
@@ -119,43 +118,35 @@ app.put("/eventos/:id", ensureAuthenticated, async (req, res) => {
     }
 
     try {
-        const eventoStored = await prisma.evento.findUnique({
+        const notaStored = await prisma.nota.findUnique({
             where: {
                 id,
             },
-            include:{
-                notas:true
-            }
         });
 
-        if (!eventoStored) {
+        if (!notaStored) {
             res.status(404).json({
-                error: `evento con id ${id} no encontrado.`,
+                error: `nota con id ${id} no encontrado.`,
                 code: "R0001",
             });
             return;
         }
 
         if (!titulo) {
-            titulo = eventoStored.titulo;
+            titulo = notaStored.titulo;
         }
 
-        if (!fechaDeInicio) {
-            fechaDeInicio = eventoStored.fechaDeInicio;
+        if (!contenido) {
+            contenido = notaStored.contenido;
         }
 
-        if (!fechaDeFinalizacion) {
-            fechaDeFinalizacion = eventoStored.fechaDeFinalizacion;
-        }
-
-        const evento = {
+        const nota = {
             titulo,
-            fechaDeInicio,
-            fechaDeFinalizacion
+            contenido
         };
 
-        const result = await prisma.evento.update({
-            data: evento,
+        const result = await prisma.nota.update({
+            data: nota,
             where: {
                 id,
             },
@@ -167,7 +158,7 @@ app.put("/eventos/:id", ensureAuthenticated, async (req, res) => {
     }
 });
 
-app.delete("/eventos/:id", ensureAuthenticated, async (req, res) => {
+app.delete("/notas/:id", ensureAuthenticated, async (req, res) => {
     const usuario = req.user;
     const { id } = req.params;
     if (!id) {
@@ -178,19 +169,19 @@ app.delete("/eventos/:id", ensureAuthenticated, async (req, res) => {
         return;
     }
     try {
-        const evento = await prisma.evento.findUnique({
+        const nota = await prisma.nota.findUnique({
             where: {
                 id,
             },
         });
-        if (!evento) {
+        if (!nota) {
             res.status(404).json({
-                error: `evento con id ${id} no encontrado.`,
+                error: `nota con id ${id} no encontrado.`,
                 code: "R0001",
             });
             return;
         }
-        const result = await prisma.evento.delete({
+        const result = await prisma.nota.delete({
             where: {
                 id,
             },
