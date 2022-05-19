@@ -1,6 +1,4 @@
 @REM  
-@REM Aun no ha sido probado en windows
-@REM 
 @REM    Autores:
     @REM  Alejandro de Jesús ¨Sánchez Morales
     @REM  Emanuel Alejandro Solórzano Guzmán
@@ -36,12 +34,15 @@ echo # Variables de entorno para la api > .env
 echo DB_HOST=localhost >> .env
 echo DB_USER=%DB_USER% >> .env
 echo DB_PASSWORD=%DB_PASSWORD% >> .env
-echo PORT=%PORT% >> .env
+echo USERS_API_PORT=%USERS_API_PORT% >> .env
+echo EVENTS_API_PORT=%EVENTS_API_PORT% >> .env
+echo NOTES_API_PORT=%NOTES_API_PORT% >> .env
 echo API_KEY=%API_KEY% >> .env
 echo DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/mydb?schema=public" >> .env
 
 xcopy /y/f .env usuarios-api/
 xcopy /y/f .env agenda-api/
+xcopy /y/f .env nota-api/
 
 docker-compose up -d --build postgres
 
@@ -51,6 +52,7 @@ echo Instalando módulos de node...
 set pwd=%~dp0
 docker run -it --rm -w /app -v %pwd%/usuarios-api/:/app node:16 npm i
 docker run -it --rm -w /app -v %pwd%/agenda-api/:/app node:16 npm i
+docker run -it --rm -w /app -v %pwd%/nota-api/:/app node:16 npm i
 
 echo  Creando base de datos...
 
@@ -60,6 +62,7 @@ echo Generando los clientes de prisma para los ambientes de docker...
 
 docker run -it --rm -w /app -v %pwd%/usuarios-api/:/app node:16 npm run generate
 docker run -it --rm -w /app -v %pwd%/agenda-api/:/app node:16 npm run generate
+docker run -it --rm -w /app -v %pwd%/nota-api/:/app node:16 npm run generate
 
 set /p USERNAME2="Ingresa el nombre de usuario para el administrador de la api: default [admin]: "
 IF [%USERNAME2%] == [] set USERNAME2=admin
