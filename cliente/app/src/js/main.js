@@ -1,10 +1,9 @@
-const host = "http://home.alethetwin.online";
-
+const host = window.location.host;
 var eventos = [];
 var eventosFiltrados = eventos;
 
 if (token != undefined) {
-    let url = `${host}:4001/eventos`;
+    let url = `${host}:8081/eventos`;
     axios
         .get(url, {
             headers: {
