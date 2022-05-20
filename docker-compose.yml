@@ -20,7 +20,7 @@ services:
         links:
             - postgres
         ports:
-            - ${USERS_API_PORT}:8080
+            - ${USERS_API_PORT}:${USERS_API_PORT}
         environment:
             - DB_HOST=postgres
         depends_on:
@@ -67,7 +67,6 @@ services:
         image: alethetwin/lamp:amd64
         ports:
             - 80:80
-            - 3306:3306
         volumes: 
             - ./cliente/db:/var/lib/mysql
             - ./cliente/app:/app
