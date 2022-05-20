@@ -4,6 +4,7 @@ $("#login-form").submit(async (event) => {
     event.preventDefault();
     ocultarAlerta();
     let url = `${host}:8080/login`;
+    console.log(url);
     let usernameInput = $("#username-input").val();
     let passwordInput = $("#password-input").val();
     try {
@@ -14,7 +15,7 @@ $("#login-form").submit(async (event) => {
         
         location.href = `/functions/save_session.php?email=${usuario.email}&id=${usuario.id}&nombre=${usuario.nombre}&token=${usuario.token}&username=${usuario.username}`;
     } catch (error) {
-        
+        console.log(error);
         if (!error.response) {
             // alert("algo salió mal, reintente de nuevo más tarde")
             mostrarAlerta("algo salió mal, reintente de nuevo más tarde");
