@@ -1,5 +1,3 @@
-// const host = "http://mac-mini-de-ale.local";
-
 $("#login-form").submit(async (event) => {
     event.preventDefault();
     ocultarAlerta();
