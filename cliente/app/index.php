@@ -16,7 +16,10 @@
                 Debes iniciar sesión primero.
             </div>
             <div class="container-fluid  event-box" id="eventos"></div>
-
+            <div class="speaking">
+                <p id="speaking"></p>
+                <img src="src/img/logo.png" width="50px" alt="">
+            </div>
         <?php
         } else {
         ?>
