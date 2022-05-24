@@ -63,7 +63,7 @@ services:
         # ports:
         #     - 8000:8000
         command: "bash run.sh"
-    lamp:
+    cliente:
         image: alethetwin/lamp:amd64
         # ports:
         #     - 80:80
@@ -85,7 +85,7 @@ services:
             - usuarios_api
             - eventos_api
             - notas_api
-            - lamp
+            - cliente
             - chat
 volumes:
     postgres:  
