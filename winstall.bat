@@ -15,14 +15,14 @@ IF [%DB_USER%] == [] set DB_USER=admin
 set /p DB_PASSWORD="Ingresa la contraseña para el usuario de la base de datos: default [admin]: "
 IF [%DB_PASSWORD%] == [] set DB_PASSWORD=admin
 
-set /p USERS_API_PORT="Ingresa el puerto para la api de los usuarios: default [8080]: "
-IF [%USERS_API_PORT%] == [] set USERS_API_PORT=8080
+set /p PORT="Ingresa el puerto en el que el servicio va a correr: default [80]: "
+IF [%PORT%] == [] set PORT=80
 
-set /p EVENTS_API_PORT="Ingresa el puerto para la api de los eventos: default [8081]: "
-IF [%EVENTS_API_PORT%] == [] set EVENTS_API_PORT=8081
+@REM set /p EVENTS_API_PORT="Ingresa el puerto para la api de los eventos: default [8081]: "
+@REM IF [%EVENTS_API_PORT%] == [] set EVENTS_API_PORT=8081
 
-set /p NOTES_API_PORT="Ingresa el puerto para la api de las notas: default [8082]: "
-IF [%NOTES_API_PORT%] == [] set NOTES_API_PORT=8082
+@REM set /p NOTES_API_PORT="Ingresa el puerto para la api de las notas: default [8082]: "
+@REM IF [%NOTES_API_PORT%] == [] set NOTES_API_PORT=8082
 
 SET API_KEY=%random%%random%%random%%random%%random%%random%
 
@@ -34,9 +34,10 @@ echo # Variables de entorno para la api > .env
 echo DB_HOST=localhost >> .env
 echo DB_USER=%DB_USER% >> .env
 echo DB_PASSWORD=%DB_PASSWORD% >> .env
-echo USERS_API_PORT=%USERS_API_PORT% >> .env
-echo EVENTS_API_PORT=%EVENTS_API_PORT% >> .env
-echo NOTES_API_PORT=%NOTES_API_PORT% >> .env
+@REM echo USERS_API_PORT=%USERS_API_PORT% >> .env
+@REM echo EVENTS_API_PORT=%EVENTS_API_PORT% >> .env
+@REM echo NOTES_API_PORT=%NOTES_API_PORT% >> .env
+echo PORT=%PORT% >> .env
 echo API_KEY=%API_KEY% >> .env
 echo DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:5432/mydb?schema=public" >> .env
 
@@ -64,15 +65,15 @@ docker run -it --rm -w /app -v %pwd%/usuarios-api/:/app node:16 npm run generate
 docker run -it --rm -w /app -v %pwd%/agenda-api/:/app node:16 npm run generate
 docker run -it --rm -w /app -v %pwd%/nota-api/:/app node:16 npm run generate
 
-set /p USERNAME2="Ingresa el nombre de usuario para el administrador de la api: default [admin]: "
-IF [%USERNAME2%] == [] set USERNAME2=admin
+@REM set /p USERNAME2="Ingresa el nombre de usuario para el administrador de la api: default [admin]: "
+@REM IF [%USERNAME2%] == [] set USERNAME2=admin
 
-set /p PASSWORD="Ingresa la contraseña para el administrador de la api: default [admin]:: "
-IF [%PASSWORD%] == [] set PASSWORD=admin
+@REM set /p PASSWORD="Ingresa la contraseña para el administrador de la api: default [admin]:: "
+@REM IF [%PASSWORD%] == [] set PASSWORD=admin
 
-echo %USERNAME2%:%PASSWORD%
+@REM echo %USERNAME2%:%PASSWORD%
 
-docker run -it --rm --network="host" -w /app -v %pwd%/usuarios-api/:/app node:16 node create-user --username %USERNAME2% --password %PASSWORD%
+@REM docker run -it --rm --network="host" -w /app -v %pwd%/usuarios-api/:/app node:16 node create-user --username %USERNAME2% --password %PASSWORD%
 
 
 echo Apagando el servicio de base de datos...

@@ -1,7 +1,7 @@
 $("#login-form").submit(async (event) => {
     event.preventDefault();
     ocultarAlerta();
-    let url = `${host}:8080/login`;
+    let url = `${host}/autenticacion/login`;
     console.log(url);
     let usernameInput = $("#username-input").val();
     let passwordInput = $("#password-input").val();

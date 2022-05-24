@@ -4,7 +4,7 @@ var eventosFiltrados = eventos;
 
 
 if (token != undefined) {
-    let url = `${host}:8081/eventos`;
+    let url = `${host}/agenda/eventos`;
     axios
         .get(url, {
             headers: {

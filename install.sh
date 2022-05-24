@@ -34,26 +34,26 @@ if [ "$DB_PASSWORD" = "" ]; then
 fi
 
 
-printf "${reset}Ingresa el puerto para la api de los usuarios: default [8080]:\n"
-read USERS_API_PORT
+printf "${reset}Ingresa el puerto en el que el servicio va a correr: default [80]:\n"
+read PORT
 
-if [ "$USERS_API_PORT" = "" ]; then
-    USERS_API_PORT=8080
+if [ "$PORT" = "" ]; then
+    PORT=80
 fi
 
-printf "${reset}Ingresa el puerto para la api de los eventos: default [8081]:\n"
-read EVENTS_API_PORT
+# printf "${reset}Ingresa el puerto para la api de los eventos: default [8081]:\n"
+# read EVENTS_API_PORT
 
-if [ "$EVENTS_API_PORT" = "" ]; then
-    EVENTS_API_PORT=8081
-fi
+# if [ "$EVENTS_API_PORT" = "" ]; then
+#     EVENTS_API_PORT=8081
+# fi
 
-printf "${reset}Ingresa el puerto para la api de las notas: default [8082]:\n"
-read NOTES_API_PORT
+# printf "${reset}Ingresa el puerto para la api de las notas: default [8082]:\n"
+# read NOTES_API_PORT
 
-if [ "$NOTES_API_PORT" = "" ]; then
-    NOTES_API_PORT=8082
-fi
+# if [ "$NOTES_API_PORT" = "" ]; then
+#     NOTES_API_PORT=8082
+# fi
 
 printf "${cyan}Generando la llave secreta para la decodificación de los tokens de acceso...\n"
 
@@ -68,9 +68,10 @@ echo "
 DB_HOST=localhost
 DB_USER=$DB_USER
 DB_PASSWORD=$DB_PASSWORD
-USERS_API_PORT=$USERS_API_PORT
-EVENTS_API_PORT=$EVENTS_API_PORT
-NOTES_API_PORT=$NOTES_API_PORT
+# USERS_API_PORT=$USERS_API_PORT
+# EVENTS_API_PORT=$EVENTS_API_PORT
+# NOTES_API_PORT=$NOTES_API_PORT
+PORT=$PORT
 API_KEY=$API_KEY
 
 
@@ -110,22 +111,22 @@ docker run -it --rm -w /app -v $(pwd)/usuarios-api/:/app node:16 npm run generat
 docker run -it --rm -w /app -v $(pwd)/agenda-api/:/app node:16 npm run generate
 docker run -it --rm -w /app -v $(pwd)/nota-api/:/app node:16 npm run generate
 
-printf "${reset}\n"
-printf "${reset}Ingresa el nombre de usuario para el administrador de la api: default [admin]:\n"
-read USERNAME
+# printf "${reset}\n"
+# printf "${reset}Ingresa el nombre de usuario para el administrador de la api: default [admin]:\n"
+# read USERNAME
 
-if [ "$USERNAME" = "" ]; then
-    USERNAME=admin
-fi
+# if [ "$USERNAME" = "" ]; then
+#     USERNAME=admin
+# fi
 
-printf "${reset}Ingresa la contraseña para el administrador de la api: default [admin]:\n"
-read PASSWORD
+# printf "${reset}Ingresa la contraseña para el administrador de la api: default [admin]:\n"
+# read PASSWORD
 
-if [ "$PASSWORD" = "" ]; then
-    PASSWORD=admin
-fi
+# if [ "$PASSWORD" = "" ]; then
+#     PASSWORD=admin
+# fi
 
-docker run -it --rm --network="host" -w /app -v $(pwd)/usuarios-api:/app node:16 node create-user --username $USERNAME --password $PASSWORD
+# docker run -it --rm --network="host" -w /app -v $(pwd)/usuarios-api:/app node:16 node create-user --username $USERNAME --password $PASSWORD
 
 printf "${reset}\n"
 
