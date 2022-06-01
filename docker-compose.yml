@@ -2,44 +2,46 @@ version: "3.3"
 services:
     postgres:
         image: postgres:10.3
-        restart: always
+        restart: always # Si falla que se reinicie siempre
         environment:
-            - POSTGRES_USER=${DB_USER}
-            - POSTGRES_PASSWORD=${DB_PASSWORD}
+            - POSTGRES_USER=${DB_USER} # El usuario de la base de datos
+            - POSTGRES_PASSWORD=${DB_PASSWORD} # La contraseña de la base de datos
         volumes:
-            - postgres:/var/lib/postgresql/data
+            - postgres:/var/lib/postgresql/data # Volumen para la persistencia de la base de datos
         ports:
-            - 5432:5432
+            - 5432:5432 # Puerto de servicio de la base de datos
     usuarios_api:
         image: node:16
         volumes: 
-            - ./usuarios-api:/home/node/app
+            - ./usuarios-api:/home/node/app # se le pasa como volumen el proyecto de usuarios
         user: node
-        working_dir: /home/node/app/
-        command: "npm start"
+        working_dir: /home/node/app/ # El punto de entrada para esta imagen, aquí se aloja el proyecto de node
+        command: "npm start" # Iniciar la aplicacion
         links:
-            - postgres
-        # ports:
-        #     - ${USERS_API_PORT}:${USERS_API_PORT}
+            - postgres # Link para que pueda conectarse a la base de datos
         environment:
-            - DB_HOST=postgres
+            - DB_HOST=postgres # Se le pasa el nombre del host de la bd, que en este caso es el nombre del servicio
         depends_on:
-            - postgres
+            - postgres # esperar a que se inicie la base de datos para iniciar este servicio
+
+
+    # Los parametros para este servicio son los mismos que en el servicio de usuarios
     eventos_api:
         image: node:16
         volumes: 
-            - ./agenda-api:/home/node/app
+            - ./agenda-api:/home/node/app 
         user: node
         working_dir: /home/node/app/
         command: "npm start"
         links:
             - postgres
-        # ports:
-        #     - ${EVENTS_API_PORT}:${EVENTS_API_PORT}
         environment:
             - DB_HOST=postgres
         depends_on:
             - postgres
+
+            
+    # Los parametros para este servicio son los mismos que en el servicio de usuarios
     notas_api:
         image: node:16
         volumes: 
@@ -49,44 +51,36 @@ services:
         command: "npm start"
         links:
             - postgres
-        # ports:
-        #     - ${NOTES_API_PORT}:${NOTES_API_PORT}
         environment:
             - DB_HOST=postgres
         depends_on:
             - postgres
     chat:
-        image: alethetwin/python-tensorflow
+        image: alethetwin/python-tensorflow  # una imagen que trae instaladas ya las ddependencias de python, tesorflow y spine para las necesidades de este servicio
         volumes:
-            - ./chatbot-api:/app
+            - ./chatbot-api:/app # Se la pasa el proyecto de el asistente como un volumen
         working_dir: /app/
-        # ports:
-        #     - 8000:8000
-        command: "bash run.sh"
+        command: "bash run.sh"  # Es script run ejecuta el servicio asistente y su interfaz soap
     cliente:
         image: alethetwin/lamp:amd64
-        # ports:
-        #     - 80:80
-        volumes: 
-            - ./cliente/db:/var/lib/mysql
-            - ./cliente/app:/app
+        volumes:  
+            - ./cliente/app:/app # se le pasa al apliciación de php como volumen
         command: 
             - /run.sh
         environment:
-            MYSQL_ADMIN_PASS: 123456
-            PHP_VERSION: 8.1
+            PHP_VERSION: 8.1 # Se necesita esta versión de PHP, así que se le pasa como variable de entorno
     proxy:
         image: nginx
         volumes:
-            - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf
+            - ./proxy/nginx.conf:/etc/nginx/conf.d/default.conf # Se le manda la configuración del proxy como un volumen
         ports:
-            - ${PORT}:80
-        depends_on:
+            - ${PORT}:80 # El puerto del servicio del proxy
+        depends_on: # Se especifica que este servicio depende de todos los demás al iniciar
             - usuarios_api
             - eventos_api
             - notas_api
             - cliente
             - chat
 volumes:
-    postgres:  
+    postgres:  # volumen para la base de datos
 
