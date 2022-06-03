@@ -108,9 +108,9 @@ app.post("/eventos/", ensureAuthenticated, async (req, res) => {
 });
 
 app.put("/eventos/:id", ensureAuthenticated, async (req, res) => {
-    const usuario = req.user;
-    const { id } = req.params;
-    const { titulo, fechaDeInicio, fechaDeFinalizacion } = req.body;
+    var usuario = req.user;
+    var { id } = req.params;
+    var { titulo, fechaDeInicio, fechaDeFinalizacion } = req.body;
 
     if (!id || (!titulo && !fechaDeInicio && !fechaDeFinalizacion)) {
         res.status(500).json({
@@ -121,7 +121,7 @@ app.put("/eventos/:id", ensureAuthenticated, async (req, res) => {
     }
 
     try {
-        const eventoStored = await prisma.evento.findUnique({
+        var eventoStored = await prisma.evento.findUnique({
             where: {
                 id,
             },
@@ -150,13 +150,13 @@ app.put("/eventos/:id", ensureAuthenticated, async (req, res) => {
             fechaDeFinalizacion = eventoStored.fechaDeFinalizacion;
         }
 
-        const evento = {
+        var evento = {
             titulo,
             fechaDeInicio,
             fechaDeFinalizacion,
         };
 
-        const result = await prisma.evento.update({
+        var result = await prisma.evento.update({
             data: evento,
             where: {
                 id,
